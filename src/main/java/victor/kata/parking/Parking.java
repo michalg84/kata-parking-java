@@ -7,11 +7,18 @@ import org.apache.commons.lang3.NotImplementedException;
  */
 public class Parking {
 
+    private final int availableBays;
+
+    public Parking(int availableBays) {
+        this.availableBays = availableBays;
+
+    }
+
     /**
      * @return the number of available parking bays left
      */
     public int getAvailableBays() {
-        throw new NotImplementedException("TODO");
+        return availableBays;
     }
 
     /**

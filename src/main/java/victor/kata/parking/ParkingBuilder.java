@@ -6,9 +6,11 @@ import org.apache.commons.lang3.NotImplementedException;
  * Builder class to get a parking instance
  */
 public class ParkingBuilder {
+    private int availableBays;
 
     public ParkingBuilder withSquareSize(final int size) {
-        throw new NotImplementedException("TODO");
+        availableBays = size * size;
+        return this;
     }
 
     public ParkingBuilder withPedestrianExit(final int pedestrianExitIndex) {
@@ -20,6 +22,7 @@ public class ParkingBuilder {
     }
 
     public Parking build() {
-        throw new NotImplementedException("TODO");
+
+        return new Parking(availableBays);
     }
 }
