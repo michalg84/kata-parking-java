@@ -1,29 +1,35 @@
 package victor.kata.parking;
 
-import org.apache.commons.lang3.NotImplementedException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Builder class to get a parking instance
  */
 public class ParkingBuilder {
-    private int availableBays;
+    private List<Integer> availableBays;
+    private final List<Integer> pedestrianExits = new ArrayList<>();
 
-    public ParkingBuilder withSquareSize(final int size) {
-        availableBays = size * size;
+    public ParkingBuilder withSquareSize(final int side) {
+        availableBays = IntStream.generate(() -> 0)
+                .limit((long) side * side)
+                .boxed()
+                .collect(Collectors.toCollection(ArrayList::new));
         return this;
     }
 
     public ParkingBuilder withPedestrianExit(final int pedestrianExitIndex) {
-        availableBays--;
+        this.pedestrianExits.add(pedestrianExitIndex);
         return this;
     }
 
     public ParkingBuilder withDisabledBay(final int disabledBayIndex) {
-        throw new NotImplementedException("TODO");
+        return this;
     }
 
     public Parking build() {
-
-        return new Parking(availableBays);
+        return new Parking(availableBays, pedestrianExits);
     }
 }

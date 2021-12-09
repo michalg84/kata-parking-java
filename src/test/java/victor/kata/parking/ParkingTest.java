@@ -26,20 +26,20 @@ public class ParkingTest {
     }
 
     @Test
-    public void testParkCarVehiculeTypeC() {
+    public void testParkCarVehicleTypeC() {
         assertEquals(7, parking.parkCar('C'));
         assertEquals(22, parking.getAvailableBays());
         assertTrue(parking.unparkCar(7));
     }
 
     @Test
-    public void testParkCarVehiculeTypeM() {
+    public void testParkCarVehicleTypeM() {
         assertEquals(7, parking.parkCar('M'));
         assertEquals(22, parking.getAvailableBays());
     }
 
     @Test
-    public void testParkCarTwoVehicules() {
+    public void testParkCarTwoVehicles() {
         assertEquals(7, parking.parkCar('C'));
         assertEquals(22, parking.getAvailableBays());
 

@@ -2,23 +2,27 @@ package victor.kata.parking;
 
 import org.apache.commons.lang3.NotImplementedException;
 
+import java.util.List;
+
 /**
  * Handles the parking mechanisms: park/unpark a car (also for disabled-only bays) and provides a string representation of its state.
  */
 public class Parking {
 
-    private final int availableBays;
+    private final List<Integer> availableBays;
+    private final List<Integer> pedestrianExits;
 
-    public Parking(int availableBays) {
+
+    Parking(List<Integer> availableBays, List<Integer> pedestrianExits) {
         this.availableBays = availableBays;
-
+        this.pedestrianExits = pedestrianExits;
     }
 
     /**
      * @return the number of available parking bays left
      */
     public int getAvailableBays() {
-        return availableBays;
+        return availableBays.size() - pedestrianExits.size();
     }
 
     /**
@@ -64,4 +68,7 @@ public class Parking {
         throw new NotImplementedException("TODO");
     }
 
+    List<Integer> getPedestrianExitIndexes() {
+        return pedestrianExits;
+    }
 }
