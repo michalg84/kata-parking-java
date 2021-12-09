@@ -14,7 +14,8 @@ public class ParkingBuilder {
     }
 
     public ParkingBuilder withPedestrianExit(final int pedestrianExitIndex) {
-        throw new NotImplementedException("TODO");
+        availableBays--;
+        return this;
     }
 
     public ParkingBuilder withDisabledBay(final int disabledBayIndex) {
