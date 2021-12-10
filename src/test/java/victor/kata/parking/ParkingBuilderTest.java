@@ -27,6 +27,8 @@ public class ParkingBuilderTest {
     public void testBuildParkingWithDisabledSlot() {
         final Parking parking = new ParkingBuilder().withSquareSize(2).withDisabledBay(2).build();
         assertEquals(4, parking.getAvailableBays());
+        assertEquals(1, parking.getDisabledBayIndexes().size());
+        assertEquals(2, parking.getDisabledBayIndexes().get(0).intValue());
     }
 
     @Test
@@ -41,6 +43,13 @@ public class ParkingBuilderTest {
                 .withDisabledBay(72)
                 .build();
         assertEquals(97, parking.getAvailableBays());
+        assertEquals(3, parking.getDisabledBayIndexes().size());
+        assertEquals(2, parking.getDisabledBayIndexes().get(0).intValue());
+        assertEquals(47, parking.getDisabledBayIndexes().get(1).intValue());
+        assertEquals(72, parking.getDisabledBayIndexes().get(2).intValue());
+        assertEquals(3, parking.getPedestrianExitIndexes().size());
+        assertEquals(8, parking.getPedestrianExitIndexes().get(0).intValue());
+        assertEquals(42, parking.getPedestrianExitIndexes().get(1).intValue());
+        assertEquals(85, parking.getPedestrianExitIndexes().get(2).intValue());
     }
-
 }

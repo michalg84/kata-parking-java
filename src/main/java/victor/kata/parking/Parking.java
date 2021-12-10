@@ -11,11 +11,13 @@ public class Parking {
 
     private final List<Integer> availableBays;
     private final List<Integer> pedestrianExits;
+    private final List<Integer> disabledBay;
 
 
-    Parking(List<Integer> availableBays, List<Integer> pedestrianExits) {
+    Parking(List<Integer> availableBays, List<Integer> pedestrianExits, List<Integer> disabledBay) {
         this.availableBays = availableBays;
         this.pedestrianExits = pedestrianExits;
+        this.disabledBay = disabledBay;
     }
 
     /**
@@ -70,5 +72,8 @@ public class Parking {
 
     List<Integer> getPedestrianExitIndexes() {
         return pedestrianExits;
+    }
+    List<Integer> getDisabledBayIndexes() {
+        return disabledBay;
     }
 }
