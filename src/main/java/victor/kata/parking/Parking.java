@@ -14,17 +14,19 @@ public class Parking {
     public static final String DISABLED_BAY = "@";
     public static final String EMPTY_BAY = "U";
     public static final String OCCUPIED_BAY = "D";
+    private Integer laneLength;
     private final List<String> bays;
 
 
-    Parking(List<String> bays) {
+    Parking(int laneLength, List<String> bays) {
+        this.laneLength = laneLength;
         this.bays = bays;
     }
 
     /**
      * @return the number of available parking bays left
      */
-    public int getBays() {
+    public int getBaysCount() {
         return bays.size() - (int) bays.stream().filter(EXIT::equals).count();
     }
 
@@ -66,16 +68,27 @@ public class Parking {
      */
     @Override
     public String toString() {
-        throw new NotImplementedException("TODO");
+        final StringBuilder builder = new StringBuilder();
+        int index = 0;
+        for (String bay : bays) {
+            if (index > 0 && index % laneLength == 0) {
+                builder.append(System.lineSeparator());
+            }
+            builder.append(bay);
+            index++;
+        }
+        return builder.toString();
     }
 
     List<Integer> getIndexes(String disabledBay) {
         List<Integer> list = new ArrayList<>();
-        for (int i = 0, availableBaysSize = bays.size(); i < availableBaysSize; i++) {
+        int i = 0;
+        while (i < bays.size()) {
             String availableBay = bays.get(i);
             if (disabledBay.equals(availableBay)) {
                 list.add(i);
             }
+            i++;
         }
         return list;
     }

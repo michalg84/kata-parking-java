@@ -11,12 +11,12 @@ import static victor.kata.parking.Parking.*;
  * Builder class to get a parking instance
  */
 public class ParkingBuilder {
-    private Integer size;
+    private int side;
     private final List<Integer> disabledBay = new ArrayList<>();
     private final List<Integer> pedestrianExits = new ArrayList<>();
 
     public ParkingBuilder withSquareSize(final int side) {
-        this.size = side * side;
+        this.side = side;
         return this;
     }
 
@@ -32,10 +32,10 @@ public class ParkingBuilder {
 
     public Parking build() {
         final List<String> availableBays = Stream.generate(() -> EMPTY_BAY)
-                .limit(size)
+                .limit(side*side)
                 .collect(Collectors.toCollection(ArrayList::new));
         pedestrianExits.forEach(pe -> availableBays.set(pe, EXIT));
         disabledBay.forEach(db -> availableBays.set(db, DISABLED_BAY));
-        return new Parking(availableBays);
+        return new Parking(side, availableBays);
     }
 }
