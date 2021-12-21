@@ -3,9 +3,9 @@ package victor.kata.parking;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
-import static java.util.Collections.unmodifiableList;
+import static victor.kata.parking.Parking.*;
 
 /**
  * Builder class to get a parking instance
@@ -31,12 +31,11 @@ public class ParkingBuilder {
     }
 
     public Parking build() {
-        final ArrayList<Integer> availableBays = IntStream.generate(() -> 0)
+        final List<String> availableBays = Stream.generate(() -> EMPTY_BAY)
                 .limit(size)
-                .boxed()
                 .collect(Collectors.toCollection(ArrayList::new));
-        return new Parking(availableBays,
-                unmodifiableList(pedestrianExits),
-                unmodifiableList(disabledBay));
+        pedestrianExits.forEach(pe -> availableBays.set(pe, EXIT));
+        disabledBay.forEach(db -> availableBays.set(db, DISABLED_BAY));
+        return new Parking(availableBays);
     }
 }

@@ -2,6 +2,7 @@ package victor.kata.parking;
 
 import org.apache.commons.lang3.NotImplementedException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -9,31 +10,29 @@ import java.util.List;
  */
 public class Parking {
 
-    private final List<Integer> availableBays;
-    private final List<Integer> pedestrianExits;
-    private final List<Integer> disabledBay;
+    public static final String EXIT = "=";
+    public static final String DISABLED_BAY = "@";
+    public static final String EMPTY_BAY = "U";
+    public static final String OCCUPIED_BAY = "D";
+    private final List<String> bays;
 
 
-    Parking(List<Integer> availableBays, List<Integer> pedestrianExits, List<Integer> disabledBay) {
-        this.availableBays = availableBays;
-        this.pedestrianExits = pedestrianExits;
-        this.disabledBay = disabledBay;
+    Parking(List<String> bays) {
+        this.bays = bays;
     }
 
     /**
      * @return the number of available parking bays left
      */
-    public int getAvailableBays() {
-        return availableBays.size() - pedestrianExits.size();
+    public int getBays() {
+        return bays.size() - (int) bays.stream().filter(EXIT::equals).count();
     }
 
     /**
      * Park the car of the given type ('D' being dedicated to disabled people) in closest -to pedestrian exit- and first (starting from the parking's entrance)
      * available bay. Disabled people can only park on dedicated bays.
      *
-     *
-     * @param carType
-     *            the car char representation that has to be parked
+     * @param carType the car char representation that has to be parked
      * @return bay index of the parked car, -1 if no applicable bay found
      */
     public int parkCar(final char carType) {
@@ -60,7 +59,7 @@ public class Parking {
      * <li>the char representation of a parked vehicle for non-empty bays.
      * </ul>
      * U, D, @ and = can be considered as reserved chars.
-     *
+     * <p>
      * Once an end of lane is reached, then the next lane is reversed (to represent the fact that cars need to turn around)
      *
      * @return the string representation of the parking as a 2-dimensional square. Note that cars do a U turn to continue to the next lane.
@@ -70,10 +69,14 @@ public class Parking {
         throw new NotImplementedException("TODO");
     }
 
-    List<Integer> getPedestrianExitIndexes() {
-        return pedestrianExits;
-    }
-    List<Integer> getDisabledBayIndexes() {
-        return disabledBay;
+    List<Integer> getIndexes(String disabledBay) {
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0, availableBaysSize = bays.size(); i < availableBaysSize; i++) {
+            String availableBay = bays.get(i);
+            if (disabledBay.equals(availableBay)) {
+                list.add(i);
+            }
+        }
+        return list;
     }
 }
