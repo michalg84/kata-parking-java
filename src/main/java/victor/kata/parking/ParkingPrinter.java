@@ -13,13 +13,20 @@ class ParkingPrinter {
 
     public String toString() {
         final StringBuilder parkingBuilder = new StringBuilder();
-        StringBuilder lineBuilder = new StringBuilder();
-        int index = 0;
+        final StringBuilder lineBuilder = new StringBuilder();
+        int bayIndex = 0;
         for (String bay : bays) {
             lineBuilder.append(bay);
-            index++;
-            if (isEndOfLine(index)) {
-                final String line = handleLineEndAndCreation(lineBuilder, laneLength, index);
+            bayIndex++;
+            if (isEndOfLine(bayIndex)) {
+                if (isOddLine(laneLength, bayIndex)) {
+                    lineBuilder.reverse();
+                }
+                lineBuilder.append("\n");
+                if (isEndOfParking(laneLength, bayIndex)) {
+                    lineBuilder.deleteCharAt(lineBuilder.length() - 1);
+                }
+                String line = lineBuilder.toString();
                 clearContentOf(lineBuilder);
                 parkingBuilder.append(line);
             }
@@ -35,22 +42,11 @@ class ParkingPrinter {
         return index % laneLength == 0;
     }
 
-    private String handleLineEndAndCreation(StringBuilder builder, Integer laneLength, Integer index) {
-        if (isOddRow(laneLength, index)) {
-            builder.reverse();
-        }
-        final StringBuilder lineBuilder = builder;
-        if (!isEndOfParking(laneLength, index)) {
-            lineBuilder.append("\n");
-        }
-        return lineBuilder.toString();
-    }
-
     private boolean isEndOfParking(Integer laneLength, Integer index) {
         return laneLength * laneLength == index;
     }
 
-    private boolean isOddRow(Integer laneLength, Integer index) {
+    private boolean isOddLine(Integer laneLength, Integer index) {
         return index / laneLength % 2 == 0;
     }
 }
