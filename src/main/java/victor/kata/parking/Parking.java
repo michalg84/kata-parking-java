@@ -14,14 +14,20 @@ public class Parking {
     public static final String DISABLED_BAY = "@";
     public static final String EMPTY_BAY = "U";
     public static final String OCCUPIED_BAY = "D";
-    private Integer laneLength;
     private final List<String> bays;
+    private Integer laneLength;
 
 
     Parking(int laneLength, List<String> bays) {
         this.laneLength = laneLength;
         this.bays = bays;
     }
+/*
+01 02 03 04
+08 07 06 05
+09 10 11 12
+16 15 14 13
+ */
 
     /**
      * @return the number of available parking bays left
@@ -51,6 +57,19 @@ public class Parking {
         throw new NotImplementedException("TODO");
     }
 
+    List<Integer> getIndexes(String disabledBay) {
+        List<Integer> list = new ArrayList<>();
+        int i = 0;
+        while (i < bays.size()) {
+            String availableBay = bays.get(i);
+            if (disabledBay.equals(availableBay)) {
+                list.add(i);
+            }
+            i++;
+        }
+        return list;
+    }
+
     /**
      * Print a 2-dimensional representation of the parking with the following rules:
      * <ul>
@@ -68,28 +87,8 @@ public class Parking {
      */
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        int index = 0;
-        for (String bay : bays) {
-            if (index > 0 && index % laneLength == 0) {
-                builder.append(System.lineSeparator());
-            }
-            builder.append(bay);
-            index++;
-        }
-        return builder.toString();
+        final ParkingPrinter parkingPrinter = new ParkingPrinter(bays);
+        return parkingPrinter.toString();
     }
 
-    List<Integer> getIndexes(String disabledBay) {
-        List<Integer> list = new ArrayList<>();
-        int i = 0;
-        while (i < bays.size()) {
-            String availableBay = bays.get(i);
-            if (disabledBay.equals(availableBay)) {
-                list.add(i);
-            }
-            i++;
-        }
-        return list;
-    }
 }
