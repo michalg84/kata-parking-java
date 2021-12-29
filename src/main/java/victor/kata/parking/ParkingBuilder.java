@@ -32,7 +32,7 @@ public class ParkingBuilder {
 
     public Parking build() {
         final List<String> availableBays = Stream.generate(() -> EMPTY_BAY)
-                .limit(side * side)
+                .limit((long) side * side)
                 .collect(Collectors.toCollection(ArrayList::new));
         pedestrianExits.forEach(pe -> availableBays.set(pe, EXIT));
         disabledBay.forEach(db -> availableBays.set(db, DISABLED_BAY));
