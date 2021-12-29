@@ -4,41 +4,115 @@ import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalInt;
+
+import static java.util.Collections.unmodifiableList;
 
 /**
  * Handles the parking mechanisms: park/unpark a car (also for disabled-only bays) and provides a string representation of its state.
  */
 public class Parking {
+    public static final int FULL = -1;
+    public static final int FULL_DISABLED = -2;
 
-    public static final String EXIT = "=";
-    public static final String DISABLED_BAY = "@";
-    public static final String EMPTY_BAY = "U";
-    public static final String OCCUPIED_BAY = "D";
-    private final List<String> bays;
-    private final ParkingPrinter parkingPrinter;
+    private final List<Integer> bays;
+    private final List<Integer> disabledBays;
+    private final List<Integer> pedestrianExits;
+    private final List<Integer> parked = new ArrayList<>();
 
 
-    Parking(List<String> bays) {
-        this.bays = bays;
-        parkingPrinter = new ParkingPrinter(bays);
+    Parking(List<Integer> bays, List<Integer> disabledBays, List<Integer> pedestrianExits) {
+        if (pedestrianExits.isEmpty()) {
+            throw new IllegalArgumentException("Pedestrians exits are required");
+        }
+        this.bays = unmodifiableList(bays);
+        this.disabledBays = unmodifiableList(disabledBays);
+        this.pedestrianExits = unmodifiableList(pedestrianExits);
     }
 
     /**
      * @return the number of available parking bays left
      */
-    public int getBaysCount() {
-        return bays.size() - (int) bays.stream().filter(EXIT::equals).count();
+    int getAvailableBaysCount() {
+        return bays.size() - pedestrianExits.size() - parked.size();
     }
 
     /**
-     * Park the car of the given type ('D' being dedicated to disabled people) in closest -to pedestrian exit- and first (starting from the parking's entrance)
+     * Park the car of the given type ('D' being dedicated to disabled people) in closest
+     * -to pedestrian exit- and first (starting from the parking's entrance)
      * available bay. Disabled people can only park on dedicated bays.
      *
      * @param carType the car char representation that has to be parked
      * @return bay index of the parked car, -1 if no applicable bay found
      */
     public int parkCar(final char carType) {
-        throw new NotImplementedException("TODO");
+        Integer placeToParkIn = null;
+        if ('D' == carType) {
+            placeToParkIn = parkDisabledCar();
+        }
+
+        return placeToParkIn == null ? parkRegularCar() : FULL;
+    }
+
+    private Integer parkDisabledCar() {
+        var freeDisabledBays = getFreeDisabledBays();
+        var distancesToExit = getDistancesToExit(freeDisabledBays);
+        var min = minDistance(distancesToExit);
+        if (min.isPresent()) {
+
+            var placeToParkIn = freeDisabledBays.get(distancesToExit.indexOf(min.getAsInt()));
+            parked.add(placeToParkIn);
+            return placeToParkIn;
+
+        }
+
+        return null;
+    }
+
+    private int parkRegularCar() {
+        var freeBays = bays.stream()
+                .filter(bay -> !pedestrianExits.contains(bay))
+                .filter(bay -> !parked.contains(bay))
+                .toList();
+        var distancesToExit = getDistancesToExit(freeBays);
+        var min = minDistance(distancesToExit);
+        if (min.isPresent()) {
+
+            var placeToParkIn = freeBays.get(distancesToExit.indexOf(min.getAsInt()));
+            parked.add(placeToParkIn);
+            return placeToParkIn;
+
+        }
+
+        return FULL;
+    }
+
+    private List<Integer> getFreeDisabledBays() {
+        return disabledBays.stream()
+                .filter(bay -> !parked.contains(bay))
+                .toList();
+    }
+
+    private OptionalInt minDistance(List<Integer> distancesToExit) {
+        return distancesToExit.stream().mapToInt(x -> x)
+                .min();
+    }
+
+    private List<Integer> getDistancesToExit(List<Integer> freeBays) {
+        return freeBays.stream()
+                .map(this::distanceToExit).toList();
+    }
+
+
+    private int distanceToExit(int bay) {
+        return Math.abs(pedestrianExits.get(0) - bay);
+    }
+
+    private List<Integer> getFreeBays() {
+        return bays.stream()
+                .filter(bay -> !pedestrianExits.contains(bay))
+                .filter(bay -> !parked.contains(bay))
+                .toList();
     }
 
     /**
@@ -48,20 +122,15 @@ public class Parking {
      * @return true if a car was parked in the bay, false otherwise
      */
     public boolean unparkCar(final int index) {
-        throw new NotImplementedException("TODO");
+        return parked.remove(Integer.valueOf(index));
     }
 
-    List<Integer> getIndexes(String disabledBay) {
-        List<Integer> list = new ArrayList<>();
-        int i = 0;
-        while (i < bays.size()) {
-            String availableBay = bays.get(i);
-            if (disabledBay.equals(availableBay)) {
-                list.add(i);
-            }
-            i++;
-        }
-        return list;
+    public List<Integer> getDisabledBays() {
+        return disabledBays;
+    }
+
+    public List<Integer> getPedestrianExits() {
+        return pedestrianExits;
     }
 
     /**
@@ -81,7 +150,7 @@ public class Parking {
      */
     @Override
     public String toString() {
-        return parkingPrinter.print();
+//        return parkingPrinter.print();
+        throw new NotImplementedException("TODO");
     }
-
 }

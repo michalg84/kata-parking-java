@@ -2,21 +2,18 @@ package victor.kata.parking;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static victor.kata.parking.Parking.*;
+import java.util.stream.IntStream;
 
 /**
  * Builder class to get a parking instance
  */
 public class ParkingBuilder {
-    private int side;
-    private final List<Integer> disabledBay = new ArrayList<>();
+    private int size;
+    private final List<Integer> disabledBays = new ArrayList<>();
     private final List<Integer> pedestrianExits = new ArrayList<>();
 
     public ParkingBuilder withSquareSize(final int side) {
-        this.side = side;
+        this.size = side * side;
         return this;
     }
 
@@ -26,16 +23,14 @@ public class ParkingBuilder {
     }
 
     public ParkingBuilder withDisabledBay(final int index) {
-        disabledBay.add(index);
+        disabledBays.add(index);
         return this;
     }
 
     public Parking build() {
-        final List<String> availableBays = Stream.generate(() -> EMPTY_BAY)
-                .limit((long) side * side)
-                .collect(Collectors.toCollection(ArrayList::new));
-        pedestrianExits.forEach(pe -> availableBays.set(pe, EXIT));
-        disabledBay.forEach(db -> availableBays.set(db, DISABLED_BAY));
-        return new Parking(availableBays);
+        final List<Integer> availableBays = IntStream.range(0, size)
+                .boxed()
+                .toList();
+        return new Parking(availableBays, disabledBays, pedestrianExits);
     }
 }
