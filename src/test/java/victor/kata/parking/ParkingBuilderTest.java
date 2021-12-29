@@ -3,13 +3,16 @@ package victor.kata.parking;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 public class ParkingBuilderTest {
 
     @Test
-    public void testBuildBasicParking() {
-        final Parking parking = new ParkingBuilder().withSquareSize(4).build();
-        assertEquals(16, parking.getBaysCount());
+    public void testBuildParkingWithoutExits() {
+        final ParkingBuilder parkingBuilder = new ParkingBuilder().withSquareSize(4);
+        assertThrows("Pedestrians exits are required",
+                IllegalArgumentException.class,
+                parkingBuilder::build);
     }
 
     @Test
@@ -18,21 +21,25 @@ public class ParkingBuilderTest {
                 .withSquareSize(3)
                 .withPedestrianExit(5)
                 .build();
-        assertEquals(8, parking.getBaysCount());
-        assertEquals(1, parking.getIndexes(Parking.EXIT).size());
-        assertEquals(5, parking.getIndexes(Parking.EXIT).get(0).intValue());
+        assertEquals(8, parking.getAvailableBaysCount());
+        assertEquals(1, parking.getPedestrianExits().size());
+        assertEquals(5, parking.getPedestrianExits().get(0).intValue());
     }
 
     @Test
     public void testBuildParkingWithDisabledSlot() {
-        final Parking parking = new ParkingBuilder().withSquareSize(2).withDisabledBay(2).build();
-        assertEquals(4, parking.getBaysCount());
-        assertEquals(1, parking.getIndexes(Parking.DISABLED_BAY).size());
-        assertEquals(2, parking.getIndexes(Parking.DISABLED_BAY).get(0).intValue());
+        final Parking parking = new ParkingBuilder()
+                .withSquareSize(2)
+                .withDisabledBay(2)
+                .withPedestrianExit(1)
+                .build();
+        assertEquals(3, parking.getAvailableBaysCount());
+        assertEquals(1, parking.getDisabledBays().size());
+        assertEquals(2, parking.getDisabledBays().get(0).intValue());
     }
 
     @Test
-    public void testBuildParkingWithPedestrianExitsAndDisabledSlots() {
+    public void testBuildParkingWithMultiplePedestrianExitsAndDisabledSlots() {
         final Parking parking = new ParkingBuilder()
                 .withSquareSize(10)
                 .withPedestrianExit(8)
@@ -42,14 +49,14 @@ public class ParkingBuilderTest {
                 .withDisabledBay(47)
                 .withDisabledBay(72)
                 .build();
-        assertEquals(97, parking.getBaysCount());
-        assertEquals(3, parking.getIndexes(Parking.DISABLED_BAY).size());
-        assertEquals(2, parking.getIndexes(Parking.DISABLED_BAY).get(0).intValue());
-        assertEquals(47, parking.getIndexes(Parking.DISABLED_BAY).get(1).intValue());
-        assertEquals(72, parking.getIndexes(Parking.DISABLED_BAY).get(2).intValue());
-        assertEquals(3, parking.getIndexes(Parking.EXIT).size());
-        assertEquals(8, parking.getIndexes(Parking.EXIT).get(0).intValue());
-        assertEquals(42, parking.getIndexes(Parking.EXIT).get(1).intValue());
-        assertEquals(85, parking.getIndexes(Parking.EXIT).get(2).intValue());
+        assertEquals(97, parking.getAvailableBaysCount());
+        assertEquals(3, parking.getDisabledBays().size());
+        assertEquals(2, parking.getDisabledBays().get(0).intValue());
+        assertEquals(47, parking.getDisabledBays().get(1).intValue());
+        assertEquals(72, parking.getDisabledBays().get(2).intValue());
+        assertEquals(3, parking.getPedestrianExits().size());
+        assertEquals(8, parking.getPedestrianExits().get(0).intValue());
+        assertEquals(42, parking.getPedestrianExits().get(1).intValue());
+        assertEquals(85, parking.getPedestrianExits().get(2).intValue());
     }
 }
