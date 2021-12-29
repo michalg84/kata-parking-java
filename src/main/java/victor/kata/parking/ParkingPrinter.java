@@ -3,17 +3,17 @@ package victor.kata.parking;
 import java.util.List;
 
 class ParkingPrinter {
-    final List<String> bays;
-    final int laneLength;
+    private final List<String> bays;
+    private final int laneLength;
+    private final StringBuilder parkingBuilder = new StringBuilder();
+    private final StringBuilder lineBuilder = new StringBuilder();
 
     public ParkingPrinter(List<String> bays) {
         this.bays = bays;
         laneLength = (int) Math.sqrt(bays.size());
     }
 
-    public String toString() {
-        final StringBuilder parkingBuilder = new StringBuilder();
-        final StringBuilder lineBuilder = new StringBuilder();
+    public String print() {
         int bayIndex = 0;
         for (String bay : bays) {
             lineBuilder.append(bay);

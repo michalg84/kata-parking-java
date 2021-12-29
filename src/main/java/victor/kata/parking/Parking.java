@@ -15,19 +15,13 @@ public class Parking {
     public static final String EMPTY_BAY = "U";
     public static final String OCCUPIED_BAY = "D";
     private final List<String> bays;
-    private Integer laneLength;
+    private final ParkingPrinter parkingPrinter;
 
 
-    Parking(int laneLength, List<String> bays) {
-        this.laneLength = laneLength;
+    Parking(List<String> bays) {
         this.bays = bays;
+        parkingPrinter = new ParkingPrinter(bays);
     }
-/*
-01 02 03 04
-08 07 06 05
-09 10 11 12
-16 15 14 13
- */
 
     /**
      * @return the number of available parking bays left
@@ -87,8 +81,7 @@ public class Parking {
      */
     @Override
     public String toString() {
-        final ParkingPrinter parkingPrinter = new ParkingPrinter(bays);
-        return parkingPrinter.toString();
+        return parkingPrinter.print();
     }
 
 }
