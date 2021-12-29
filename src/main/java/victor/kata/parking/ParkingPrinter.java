@@ -3,6 +3,10 @@ package victor.kata.parking;
 import java.util.List;
 
 class ParkingPrinter {
+    public static final String EXIT = "=";
+    public static final String DISABLED_BAY = "@";
+    public static final String EMPTY_BAY = "U";
+    public static final String OCCUPIED_BAY = "D";
     private final List<String> bays;
     private final int laneLength;
     private final StringBuilder parkingBuilder = new StringBuilder();
