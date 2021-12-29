@@ -51,7 +51,7 @@ public class Parking {
             placeToParkIn = parkDisabledCar();
         }
 
-        return placeToParkIn == null ? parkRegularCar() : FULL;
+        return placeToParkIn == null ? parkRegularCar() : placeToParkIn;
     }
 
     private Integer parkDisabledCar() {
@@ -70,10 +70,7 @@ public class Parking {
     }
 
     private int parkRegularCar() {
-        var freeBays = bays.stream()
-                .filter(bay -> !pedestrianExits.contains(bay))
-                .filter(bay -> !parked.contains(bay))
-                .toList();
+        var freeBays = getFreeBays();
         var distancesToExit = getDistancesToExit(freeBays);
         var min = minDistance(distancesToExit);
         if (min.isPresent()) {
@@ -93,6 +90,13 @@ public class Parking {
                 .toList();
     }
 
+    private List<Integer> getFreeBays() {
+        return bays.stream()
+                .filter(bay -> !pedestrianExits.contains(bay))
+                .filter(bay -> !parked.contains(bay))
+                .toList();
+    }
+
     private OptionalInt minDistance(List<Integer> distancesToExit) {
         return distancesToExit.stream().mapToInt(x -> x)
                 .min();
@@ -106,13 +110,6 @@ public class Parking {
 
     private int distanceToExit(int bay) {
         return Math.abs(pedestrianExits.get(0) - bay);
-    }
-
-    private List<Integer> getFreeBays() {
-        return bays.stream()
-                .filter(bay -> !pedestrianExits.contains(bay))
-                .filter(bay -> !parked.contains(bay))
-                .toList();
     }
 
     /**
@@ -150,7 +147,6 @@ public class Parking {
      */
     @Override
     public String toString() {
-//        return parkingPrinter.print();
         throw new NotImplementedException("TODO");
     }
 }
