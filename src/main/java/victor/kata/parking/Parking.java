@@ -69,6 +69,20 @@ public class Parking {
         return FULL;
     }
 
+    private OptionalInt minDistance(List<Integer> distancesToExit) {
+        return distancesToExit.stream().mapToInt(x -> x)
+                .min();
+    }
+
+    private List<Integer> getDistancesToExit(List<Integer> freeBays) {
+        return freeBays.stream()
+                .map(this::distanceToExit).toList();
+    }
+
+    private int distanceToExit(int bay) {
+        return Math.abs(pedestrianExits.get(0) - bay);
+    }
+
     private List<Integer> getFreeDisabledBays() {
         return disabledBays.stream()
                 .filter(bay -> !parked.contains(bay))
@@ -80,21 +94,6 @@ public class Parking {
                 .filter(bay -> !pedestrianExits.contains(bay))
                 .filter(bay -> !parked.contains(bay))
                 .toList();
-    }
-
-    private OptionalInt minDistance(List<Integer> distancesToExit) {
-        return distancesToExit.stream().mapToInt(x -> x)
-                .min();
-    }
-
-    private List<Integer> getDistancesToExit(List<Integer> freeBays) {
-        return freeBays.stream()
-                .map(this::distanceToExit).toList();
-    }
-
-
-    private int distanceToExit(int bay) {
-        return Math.abs(pedestrianExits.get(0) - bay);
     }
 
     /**
@@ -134,29 +133,36 @@ public class Parking {
      */
     @Override
     public String toString() {
-        var baysPrintable = bays.stream()
-                .map(this::transform)
-                .collect(Collectors.joining(""));
         var builder = new StringBuilder(bays.size());
-        var lineLength = (int) Math.sqrt(bays.size());
-        int i = 0;
-        while (i < bays.size()) {
-            var line = baysPrintable.substring(i, i + lineLength);
-            i += 5;
-            if (isOddLine(lineLength, i)) {
+        var printableBays = transformToBaysOfStrings();
+        int index = 0;
+        while (index < bays.size()) {
+            var line = printableBays.substring(index, index + getLaneLength());
+            index += getLaneLength();
+            if (isOddLine(getLaneLength(), index)) {
                 builder.append(reverse(line));
             } else {
                 builder.append(line);
             }
-            if (isNotEndOfParking(lineLength, i)) {
+            if (isNotEndOfParking(getLaneLength(), index)) {
                 builder.append("\n");
             }
         }
         return builder.toString();
     }
 
-    private boolean isNotEndOfParking(int lineLength, int i) {
-        return !isEndOfParking(lineLength, i);
+    private String transformToBaysOfStrings() {
+        return bays.stream()
+                .map(this::transform)
+                .collect(Collectors.joining(""));
+    }
+
+    private int getLaneLength() {
+        return (int) Math.sqrt(bays.size());
+    }
+
+    private boolean isNotEndOfParking(int lineLength, int index) {
+        return lineLength * lineLength != index;
     }
 
 
@@ -178,11 +184,7 @@ public class Parking {
         return result;
     }
 
-    private boolean isEndOfParking(Integer laneLength, Integer index) {
-        return laneLength * laneLength == index;
-    }
-
-    private boolean isOddLine(Integer laneLength, Integer index) {
+    private boolean isOddLine(int laneLength, int index) {
         return index / laneLength % 2 == 0;
     }
 }
