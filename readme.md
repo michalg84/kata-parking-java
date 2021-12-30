@@ -1,5 +1,8 @@
 # Parking TDD Kata
 
+##Coding kata based on https://github.com/victorrentea/kata-parking-java 
+###Written with Java 17 and JUnit 4
+
 You will implement a system to manage parking slots(bays) in a parking area.
 
 - The parking has a square surface (the edge size is given at construction time).
