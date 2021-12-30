@@ -1,9 +1,9 @@
 package victor.kata.parking;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.OptionalInt;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.unmodifiableList;
@@ -22,7 +22,7 @@ public class Parking {
     private final List<Integer> bays;
     private final List<Integer> disabledBays;
     private final List<Integer> pedestrianExits;
-    private final Set<Integer> parked = new HashSet<>();
+    private final Map<Integer, String> parked = new HashMap<>();
 
     Parking(List<Integer> bays, List<Integer> disabledBays, List<Integer> pedestrianExits) {
         if (pedestrianExits.isEmpty()) {
@@ -50,20 +50,20 @@ public class Parking {
      */
     public int parkCar(final char carType) {
         if (DISABLED_CAR == carType) {
-            Integer placeToParkIn = parkCar(getFreeDisabledBays());
+            Integer placeToParkIn = parkCar(getFreeDisabledBays(), carType);
             if (placeToParkIn != FULL) {
                 return placeToParkIn;
             }
         }
-        return parkCar(getFreeBays());
+        return parkCar(getFreeBays(), carType);
     }
 
-    private Integer parkCar(List<Integer> freeDisabledBays) {
+    private Integer parkCar(List<Integer> freeDisabledBays, char carType) {
         var distancesToExit = getDistancesToExit(freeDisabledBays);
         var min = minDistance(distancesToExit);
         if (min.isPresent()) {
             var placeToParkIn = freeDisabledBays.get(distancesToExit.indexOf(min.getAsInt()));
-            parked.add(placeToParkIn);
+            parked.put(placeToParkIn, String.valueOf(carType));
             return placeToParkIn;
         }
         return FULL;
@@ -85,14 +85,14 @@ public class Parking {
 
     private List<Integer> getFreeDisabledBays() {
         return disabledBays.stream()
-                .filter(bay -> !parked.contains(bay))
+                .filter(bay -> !parked.containsKey(bay))
                 .toList();
     }
 
     private List<Integer> getFreeBays() {
         return bays.stream()
                 .filter(bay -> !pedestrianExits.contains(bay))
-                .filter(bay -> !parked.contains(bay))
+                .filter(bay -> !parked.containsKey(bay))
                 .toList();
     }
 
@@ -103,7 +103,8 @@ public class Parking {
      * @return true if a car was parked in the bay, false otherwise
      */
     public boolean unparkCar(final int index) {
-        return parked.remove(index);
+        final String remove = parked.remove(index);
+        return remove != null;
     }
 
     public List<Integer> getDisabledBays() {
@@ -178,8 +179,8 @@ public class Parking {
         if (disabledBays.contains(bay)) {
             result = DISABLED_BAY;
         }
-        if (parked.contains(bay)) {
-            result = "C";
+        if (parked.containsKey(bay)) {
+            result = parked.get(bay);
         }
         return result;
     }
