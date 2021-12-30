@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 /**
- * Builder class to get a parking instance
+ * Builder class to get a parking instance.
  */
 public class ParkingBuilder {
     private int size;

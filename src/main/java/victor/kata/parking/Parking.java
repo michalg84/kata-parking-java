@@ -1,25 +1,28 @@
 package victor.kata.parking;
 
-import org.apache.commons.lang3.NotImplementedException;
-
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.OptionalInt;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.unmodifiableList;
 
 /**
- * Handles the parking mechanisms: park/unpark a car (also for disabled-only bays) and provides a string representation of its state.
+ * Handles the parking mechanisms: park/unpark a car (also for disabled-only bays)
+ * and provides a string representation of its state.
  */
 public class Parking {
-    public static final int FULL = -1;
-    public static final int FULL_DISABLED = -2;
+    private static final String EXIT = "=";
+    private static final String DISABLED_BAY = "@";
+    private static final String EMPTY_BAY = "U";
+    private static final int FULL = -1;
+    private static final char DISABLED_CAR = 'D';
 
     private final List<Integer> bays;
     private final List<Integer> disabledBays;
     private final List<Integer> pedestrianExits;
-    private final List<Integer> parked = new ArrayList<>();
-
+    private final Set<Integer> parked = new HashSet<>();
 
     Parking(List<Integer> bays, List<Integer> disabledBays, List<Integer> pedestrianExits) {
         if (pedestrianExits.isEmpty()) {
@@ -46,41 +49,23 @@ public class Parking {
      * @return bay index of the parked car, -1 if no applicable bay found
      */
     public int parkCar(final char carType) {
-        Integer placeToParkIn = null;
-        if ('D' == carType) {
-            placeToParkIn = parkDisabledCar();
+        if (DISABLED_CAR == carType) {
+            Integer placeToParkIn = parkCar(getFreeDisabledBays());
+            if (placeToParkIn != FULL) {
+                return placeToParkIn;
+            }
         }
-
-        return placeToParkIn == null ? parkRegularCar() : placeToParkIn;
+        return parkCar(getFreeBays());
     }
 
-    private Integer parkDisabledCar() {
-        var freeDisabledBays = getFreeDisabledBays();
+    private Integer parkCar(List<Integer> freeDisabledBays) {
         var distancesToExit = getDistancesToExit(freeDisabledBays);
         var min = minDistance(distancesToExit);
         if (min.isPresent()) {
-
             var placeToParkIn = freeDisabledBays.get(distancesToExit.indexOf(min.getAsInt()));
             parked.add(placeToParkIn);
             return placeToParkIn;
-
         }
-
-        return null;
-    }
-
-    private int parkRegularCar() {
-        var freeBays = getFreeBays();
-        var distancesToExit = getDistancesToExit(freeBays);
-        var min = minDistance(distancesToExit);
-        if (min.isPresent()) {
-
-            var placeToParkIn = freeBays.get(distancesToExit.indexOf(min.getAsInt()));
-            parked.add(placeToParkIn);
-            return placeToParkIn;
-
-        }
-
         return FULL;
     }
 
@@ -113,13 +98,13 @@ public class Parking {
     }
 
     /**
-     * Unpark the car from the given index
+     * Unpark the car from the given index.
      *
-     * @param index
+     * @param index parking index to unpark a car
      * @return true if a car was parked in the bay, false otherwise
      */
     public boolean unparkCar(final int index) {
-        return parked.remove(Integer.valueOf(index));
+        return parked.remove(index);
     }
 
     public List<Integer> getDisabledBays() {
@@ -141,12 +126,64 @@ public class Parking {
      * </ul>
      * U, D, @ and = can be considered as reserved chars.
      * <p>
-     * Once an end of lane is reached, then the next lane is reversed (to represent the fact that cars need to turn around)
+     * Once an end of lane is reached, then the next lane is reversed
+     * (to represent the fact that cars need to turn around)
      *
-     * @return the string representation of the parking as a 2-dimensional square. Note that cars do a U turn to continue to the next lane.
+     * @return the string representation of the parking as a 2-dimensional square.
+     * Note that cars do a U turn to continue to the next lane.
      */
     @Override
     public String toString() {
-        throw new NotImplementedException("TODO");
+        var baysPrintable = bays.stream()
+                .map(this::transform)
+                .collect(Collectors.joining(""));
+        var builder = new StringBuilder(bays.size());
+        var lineLength = (int) Math.sqrt(bays.size());
+        int i = 0;
+        while (i < bays.size()) {
+            var line = baysPrintable.substring(i, i + lineLength);
+            i += 5;
+            if (isOddLine(lineLength, i)) {
+                builder.append(reverse(line));
+            } else {
+                builder.append(line);
+            }
+            if (isNotEndOfParking(lineLength, i)) {
+                builder.append("\n");
+            }
+        }
+        return builder.toString();
+    }
+
+    private boolean isNotEndOfParking(int lineLength, int i) {
+        return !isEndOfParking(lineLength, i);
+    }
+
+
+    private String reverse(String line) {
+        return new StringBuilder(line).reverse().toString();
+    }
+
+    private String transform(Integer bay) {
+        String result = EMPTY_BAY;
+        if (pedestrianExits.contains(bay)) {
+            result = EXIT;
+        }
+        if (disabledBays.contains(bay)) {
+            result = DISABLED_BAY;
+        }
+        if (parked.contains(bay)) {
+            result = "C";
+        }
+        return result;
+    }
+
+    private boolean isEndOfParking(Integer laneLength, Integer index) {
+        return laneLength * laneLength == index;
+    }
+
+    private boolean isOddLine(Integer laneLength, Integer index) {
+        return index / laneLength % 2 == 0;
     }
 }
+
