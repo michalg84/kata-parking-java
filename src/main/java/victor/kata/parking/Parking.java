@@ -13,16 +13,22 @@ import static java.util.Collections.unmodifiableList;
  * and provides a string representation of its state.
  */
 public class Parking {
-    private static final String EXIT = "=";
-    private static final String DISABLED_BAY = "@";
-    private static final String EMPTY_BAY = "U";
+    private static final char EXIT = '=';
+    private static final char DISABLED_BAY = '@';
+    private static final char EMPTY_BAY = 'U';
     private static final int FULL = -1;
     private static final char DISABLED_CAR = 'D';
 
+    /*"""
+                            UUUUU
+                            U=UU@
+                            @U=UU
+                            UUUUU
+                            UUUUU"""*/
     private final List<Integer> bays;
     private final List<Integer> disabledBays;
     private final List<Integer> pedestrianExits;
-    private final Map<Integer, String> parked = new HashMap<>();
+    private final Map<Integer, Character> parked = new HashMap<>();
 
     Parking(List<Integer> bays, List<Integer> disabledBays, List<Integer> pedestrianExits) {
         if (pedestrianExits.isEmpty()) {
@@ -58,29 +64,32 @@ public class Parking {
         return parkCar(getFreeBays(), carType);
     }
 
-    private Integer parkCar(List<Integer> freeDisabledBays, char carType) {
-        var distancesToExit = getDistancesToExit(freeDisabledBays);
+    private Integer parkCar(List<Integer> freeBays, char carType) {
+        var distancesToExit = getDistancesToExit(freeBays);
         var min = minDistance(distancesToExit);
         if (min.isPresent()) {
-            var placeToParkIn = freeDisabledBays.get(distancesToExit.indexOf(min.getAsInt()));
-            parked.put(placeToParkIn, String.valueOf(carType));
+            final int index = distancesToExit.indexOf(min.getAsInt());
+            var placeToParkIn = freeBays.get(index);
+            parked.put(placeToParkIn, carType);
             return placeToParkIn;
         }
         return FULL;
     }
 
     private OptionalInt minDistance(List<Integer> distancesToExit) {
-        return distancesToExit.stream().mapToInt(x -> x)
+        return distancesToExit.stream()
+                .mapToInt(x -> x)
                 .min();
     }
 
     private List<Integer> getDistancesToExit(List<Integer> freeBays) {
         return freeBays.stream()
-                .map(this::distanceToExit).toList();
+                .map(this::distanceToExit)
+                .toList();
     }
 
     private int distanceToExit(int bay) {
-        return Math.abs(pedestrianExits.get(0) - bay);
+        return pedestrianExits.stream().mapToInt(exit -> Math.abs(exit - bay)).min().getAsInt();
     }
 
     private List<Integer> getFreeDisabledBays() {
@@ -103,8 +112,7 @@ public class Parking {
      * @return true if a car was parked in the bay, false otherwise
      */
     public boolean unparkCar(final int index) {
-        final String remove = parked.remove(index);
-        return remove != null;
+        return parked.remove(index) != null;
     }
 
     public List<Integer> getDisabledBays() {
@@ -172,7 +180,7 @@ public class Parking {
     }
 
     private String transform(Integer bay) {
-        String result = EMPTY_BAY;
+        char result = EMPTY_BAY;
         if (pedestrianExits.contains(bay)) {
             result = EXIT;
         }
@@ -182,7 +190,7 @@ public class Parking {
         if (parked.containsKey(bay)) {
             result = parked.get(bay);
         }
-        return result;
+        return String.valueOf(result);
     }
 
     private boolean isOddLine(int laneLength, int index) {
