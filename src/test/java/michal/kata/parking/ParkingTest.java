@@ -1,4 +1,4 @@
-package victor.kata.parking;
+package michal.kata.parking;
 
 import org.junit.Before;
 import org.junit.Test;

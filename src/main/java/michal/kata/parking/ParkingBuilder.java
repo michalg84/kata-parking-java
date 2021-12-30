@@ -1,4 +1,4 @@
-package victor.kata.parking;
+package michal.kata.parking;
 
 import java.util.ArrayList;
 import java.util.List;

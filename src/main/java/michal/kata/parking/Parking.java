@@ -1,4 +1,4 @@
-package victor.kata.parking;
+package michal.kata.parking;
 
 import java.util.HashMap;
 import java.util.List;
@@ -89,7 +89,7 @@ public class Parking {
     }
 
     private int distanceToExit(int bay) {
-        return pedestrianExits.stream().mapToInt(exit -> Math.abs(exit - bay)).min().getAsInt();
+        return pedestrianExits.stream().mapToInt(exit -> Math.abs(exit - bay)).min().orElseThrow();
     }
 
     private List<Integer> getFreeDisabledBays() {
